@@ -35,24 +35,29 @@ public class Main extends Application {
 
         }
 
-        if(connection!=null) {
-            Parent root = FXMLLoader.load(getClass().getResource("fxml/Inicio.fxml"));
-            Scene scene = new Scene(root);
-            primaryStage.setMaximized(true);
-            primaryStage.setScene(scene);
-            Properties prop = new Properties();
-            InputStream in = getClass().getResourceAsStream("gradle.properties|");
-            prop.load(in);
-            String version = prop.getProperty("version");
-            if(version!=null) {
-                primaryStage.setTitle("HOSPITAL DEL DIA CALDERON " + version);
-            }else {
-                primaryStage.setTitle("HOSPITAL DEL DIA CALDERON - Development Version ");
-            }
+        try {
+            if (connection != null) {
+                Parent root = FXMLLoader.load(getClass().getResource("fxml/Inicio.fxml"));
+                Scene scene = new Scene(root);
+                primaryStage.setMaximized(true);
+                primaryStage.setScene(scene);
+                Properties prop = new Properties();
+                InputStream in = getClass().getResourceAsStream("gradle.properties");
+                prop.load(in);
+                String version = prop.getProperty("version");
+                if (version != null) {
+                    primaryStage.setTitle("HOSPITAL DEL DIA CALDERON " + version);
+                } else {
+                    primaryStage.setTitle("HOSPITAL DEL DIA CALDERON - Development Version ");
+                }
 
-            primaryStage.show();
-        }else{
-            Platform.exit();
+                primaryStage.show();
+            } else {
+                Platform.exit();
+            }
+        }catch (Exception ex)
+        {
+            FxDialogs.showException("Error","Error",ex);
         }
 
     }

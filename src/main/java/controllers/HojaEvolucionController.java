@@ -122,17 +122,21 @@ public class HojaEvolucionController {
             }
             r.close();
             File f = new File(e.getDirectorioarchivos()+"\\" + "prescripcion"+UUID.randomUUID()+".pdf");
-            String nombreApellidos = itemSeleccionado.getFichaPrenatal().getPaciente().getPrimernombre() + " " + itemSeleccionado.getFichaPrenatal().getPaciente().getPrimerapellido() + " " + itemSeleccionado.getFichaPrenatal().getPaciente().getSegundoapellido();
-            content = content.replace("paciente", nombreApellidos);
-            content = content.replace("fecha_emision", itemSeleccionado.getFecha().toString());
-            content = content.replace("medicina", itemSeleccionado.getMedicamentos());
+            if(itemSeleccionado.getFichaPrenatal()!=null) {
+                String nombreApellidos = itemSeleccionado.getFichaPrenatal().getPaciente().getPrimernombre() + " " + itemSeleccionado.getFichaPrenatal().getPaciente().getPrimerapellido() + " " + itemSeleccionado.getFichaPrenatal().getPaciente().getSegundoapellido();
+                content = content.replace("paciente", nombreApellidos);
+                content = content.replace("fecha_emision", itemSeleccionado.getFecha().toString());
+                content = content.replace("medicina", itemSeleccionado.getMedicamentos());
 
-            content = content.replace("directoriologo-", e.getDirectorioarchivos() + "\\");
-            content = content.replace("prescripcion", itemSeleccionado.getPrescripcion());
+                content = content.replace("directoriologo-", e.getDirectorioarchivos() + "\\");
+                content = content.replace("prescripcion", itemSeleccionado.getPrescripcion());
 
-            content = content.replace("\n\n", "<br>");
-            HtmlConverter.convertToPdf(content, new PdfWriter(f));
-            Desktop.getDesktop().open(f);
+                content = content.replace("\n\n", "<br>");
+                HtmlConverter.convertToPdf(content, new PdfWriter(f));
+                Desktop.getDesktop().open(f);
+            }else{
+                FxDialogs.showInformation("Info","Guardar la informacion antes de imprimir");
+            }
 
         }catch (Exception e) {
             e.printStackTrace();
