@@ -66,7 +66,7 @@ public class BusquedaPacienteController {
            return row;
        });
 
-
+        txtTextoBuscar.setOnKeyTyped(event -> buscar());
 
     }
 

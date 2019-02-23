@@ -1,6 +1,7 @@
 package controllers;
 
 import Dao.EmpresaDao;
+import Dao.MedicinaDao;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import entities.Empresa;
@@ -15,16 +16,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import utilidades.*;
 
-import java.awt.*;
+
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -32,6 +36,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class HojaEvolucionController {
     @FXML
@@ -72,6 +77,8 @@ public class HojaEvolucionController {
     @FXML
     private MaskerPane esperaMskPane;
 
+    @FXML private CustomTextField txtMedicina;
+
     public ObservableList<HojaEvolucionPrescripcion> listaItems = FXCollections.observableArrayList();
     private FxValidations validations = new FxValidations();
     private Boolean esNuevo=false;
@@ -104,6 +111,16 @@ public class HojaEvolucionController {
             btnImprimir.setOnAction(event -> {
                 imprimirPrescripcion();
             });
+            MedicinaDao md= new MedicinaDao();
+            List<Medicina> list = md.getMedicinaByNombre("");//.stream().map(Medicina::getDescripcion).collect(Collectors.toList());
+            TextFields.bindAutoCompletion(txtMedicina,list);
+
+            txtMedicina.setOnKeyReleased(event -> {
+                if(event.getCode()==KeyCode.ENTER){
+                    txtMedicamentos.appendText(txtMedicina.getText());
+                }
+            });
+
         }catch (Exception ex){
             FxDialogs.showException("Error","Ha ocurrido un error al cargar el formulario",ex);
         }

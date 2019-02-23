@@ -35,6 +35,7 @@ public class BuscarMedicinaController {
     public void initialize(){
         try{
             iniciarColumnas();
+            txtTextoBuscar.setOnKeyTyped(event -> buscar());
         }catch (Exception ex){
             FxDialogs.showException("Se ha generado un error!!", "Dar click para ver mas detalles...", ex);
         }

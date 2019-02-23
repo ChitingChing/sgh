@@ -24,6 +24,8 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import utilidades.*;
 
+import java.util.Random;
+
 public class PacienteController {
 
     @FXML
@@ -98,7 +100,7 @@ public class PacienteController {
         try{
             btnGuardar.setDisable(true);
             gridPaneControles.setDisable(true);
-            txtNHistoriaclinica.setDisable(true);
+            //txtNHistoriaclinica.setDisable(true);
             iniciarCombos();
             iniciarValidadores();
         }
@@ -160,7 +162,7 @@ public class PacienteController {
                Validator.createEmptyValidator("Ingrese un segundo apellido.")));
        validationSupport.registerValidator(txtSegundonombre, Validator.createRegexValidator("Ingrese solo letras en el segundo nombre",Regex.LETRASESPACIO.getExpresion(), Severity.ERROR));
        validationSupport.registerValidator(txtCelular, Validator.createRegexValidator("Ingrese un numero telefónico",Regex.TELEFONO.getExpresion(), Severity.ERROR));
-
+        validationSupport.registerValidator(txtNHistoriaclinica,Validator.createRegexValidator("Ingrese un numero",Regex.NUMEROSNOENBLANCO.getExpresion(),Severity.ERROR));
        validationSupport.validationResultProperty().addListener( (o, oldValue, newValue) ->
        {
            validations.getValidationSupport().getRegisteredControls().stream().forEach(x -> x.setTooltip(null));
@@ -176,7 +178,8 @@ public class PacienteController {
                 return;
             }
 
-            if (!txtCedula.getText().equals(paciente.getCedula())) {
+            if (txtCedula.getText()!=(paciente.getCedula())) {
+
                 if (existePaciente(txtCedula.getText().trim())) {
                     FxDialogs.showError("Cédula ya se encuentra registrada.", "Ya se encuentra registrada esta cédula. Favor ingresar otra.");
                     return;
@@ -184,9 +187,21 @@ public class PacienteController {
                     paciente = new Paciente();
                 }
             }
+            if(!Integer.valueOf(txtNHistoriaclinica.getText()).equals(paciente.getNhistoriaclinica())){
+                if(existeNhistorialClinico(Integer.valueOf(txtNHistoriaclinica.getText()))){
+                    FxDialogs.showError("Número de historia clinica ya se encuentra registrada.", "Ya se encuentra registrado este numero de historia clinica. Favor ingresar otra.");
+                    return;
+                }else if (paciente == null) {
+                    paciente = new Paciente();
+                }
+            }
             esperaMskPane.setVisible(true);
-            paciente.setCedula(txtCedula.getText().trim());
-            //paciente.setNhistoriaclinica();
+            if(!txtCedula.getText().trim().equals("")) {
+                paciente.setCedula(txtCedula.getText().trim());
+            }else{
+                paciente.setCedula(null);
+            }
+            paciente.setNhistoriaclinica(Integer.valueOf(txtNHistoriaclinica.getText().trim()));
             paciente.setPrimernombre(txtPrimerNombre.getText().trim());
             paciente.setSegundonombre(txtSegundonombre.getText().trim());
             paciente.setPrimerapellido(txtPrimerApellido.getText().trim());
@@ -270,6 +285,13 @@ public class PacienteController {
             existe=true;
        return existe;
     }
+    private Boolean existeNhistorialClinico(Integer NHistorial){
+        Boolean existe = false;
+        PacienteDao pDao = new PacienteDao();
+        if(pDao.getPacientes(NHistorial).size()>0)
+            existe=true;
+        return existe;
+    }
     private void limpiarControles(){
        txtCedula.setDisable(false);
         txtCedula.clear();
@@ -303,7 +325,11 @@ public class PacienteController {
 
         esperaMskPane.setVisible(true);
         Formularios f = new Formularios();
-        paciente= cargarDatos(f.showBusquedaPaciente());
+        Paciente p = f.showBusquedaPaciente();
+        if(p!=null){
+            paciente= cargarDatos(p);
+        }
+
         esperaMskPane.setVisible(false);
     }
     public Paciente cargarDatos(Paciente p) {

@@ -57,12 +57,12 @@ public class MedicinaDao {
     }
     public ObservableList<Medicina> getMedicinaByNombre(String Texto){
         ObservableList<Medicina> list = null;
-        Texto = "%"+Texto+"%";
+        Texto =  "%"+Texto+"%";
         try(Session session = SessionUtil.getSession()) {
             builder = session.getCriteriaBuilder();
             query = builder.createQuery(Medicina.class);
             root = query.from(Medicina.class);
-            query.select(root).where(builder.like(builder.lower(root.get("descripcion")),Texto)).orderBy(builder.desc(root.get("descripcion")));
+            query.select(root).where(builder.like(builder.upper(root.get("descripcion")),Texto.toUpperCase())).orderBy(builder.desc(root.get("descripcion")));
             //  if (session.createQuery(query).getResultList().size() > 0)
             list = FXCollections.observableArrayList(session.createQuery(query).getResultList());
         }

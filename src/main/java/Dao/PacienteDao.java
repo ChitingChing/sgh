@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import utilidades.FxDialogs;
 import utilidades.SessionUtil;
 
@@ -22,12 +23,23 @@ public class PacienteDao  {
     private CriteriaQuery<Paciente> query;
     private Root<Paciente> root;
     public List<Paciente> getPacientes(String Cedula){
-        List<Paciente> pList = new ArrayList<>();
+        List<Paciente> pList;
         try(Session session = SessionUtil.getSession()) {
             builder = session.getCriteriaBuilder();
             query = builder.createQuery(Paciente.class);
             root = query.from(Paciente.class);
             query.select(root).where(builder.equal(root.get("cedula"), Cedula));
+            pList = session.createQuery(query).getResultList();
+        }
+        return pList;
+    }
+    public List<Paciente> getPacientes(Integer NhistorialClinico){
+        List<Paciente> pList;
+        try(Session session = SessionUtil.getSession()) {
+            builder = session.getCriteriaBuilder();
+            query = builder.createQuery(Paciente.class);
+            root = query.from(Paciente.class);
+            query.select(root).where(builder.equal(root.get("nhistoriaclinica"), NhistorialClinico));
             pList = session.createQuery(query).getResultList();
         }
         return pList;
@@ -103,15 +115,15 @@ public class PacienteDao  {
         Transaction tx=null;
         Boolean resultado=false;
         try(Session session = SessionUtil.getSession()) {
-            if(insertar) {
+            if (insertar) {
                 paciente.setId(UUID.randomUUID());
-                Integer nhistoriacli = getUltimoNHistoriaClinica();
-                paciente.setNhistoriaclinica(nhistoriacli+1);
+                //Integer nhistoriacli = getUltimoNHistoriaClinica();
+                //paciente.setNhistoriaclinica(nhistoriacli+1);
             }
-             tx= session.beginTransaction();
+            tx = session.beginTransaction();
             session.saveOrUpdate(paciente);
             tx.commit();
-            resultado=true  ;
+            resultado = true;
             session.refresh(paciente);
         }catch (HibernateException ex){
             tx.rollback();
